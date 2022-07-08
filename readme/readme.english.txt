@@ -14,7 +14,7 @@
 [list]
 [li][size=0.9em]Permissions[/size]
 [list]
-[li][size=0.8em]Solve any topic[/size]
+[li][size=0.8em]Solve any topic[/size][/li]
 [li][size=0.8em]Solve own topics[/size][/li]
 [/list]
 [/li]
