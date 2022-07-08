@@ -20,6 +20,7 @@
 [/li]
 [li][size=0.9em]Select boards where it applies[/size][/li]
 [li][size=0.9em]Color the solved topics in messageindex[/size][/li]
+[li][size=0.9em]Integration with [url="https://custom.simplemachines.org/index.php?mod=4274"]Best Answer[/url][/size][/li]
 [/list]
 
 [size=3][color=#358234]Localization[/color][/size]

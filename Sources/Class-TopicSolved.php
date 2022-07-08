@@ -40,6 +40,9 @@ class TopicSolved
 
 		// Settings
 		add_integration_function('integrate_general_mod_settings', __CLASS__ . '::settings#', false, $sourcedir . '/Class-TopicSolved.php');
+
+		// Best Answer
+		add_integration_function('integrate_sycho_best_answer', __CLASS__ . '::best_answer#', false, $sourcedir . '/Class-TopicSolved.php');
 	}
 
 	/**
@@ -284,5 +287,43 @@ class TopicSolved
 	public function permissions(&$permissionGroups, &$permissionList, &$leftPermissionGroups, &$hiddenPermissions, &$relabelPermissions) : void
 	{
 		$permissionList['board']['solve_topics'] = [true, 'topic', 'moderate'];
+	}
+
+	/**
+	 * Best Answer
+	 * 
+	 * Mark the topic as solved after the best answer is chosen
+	 * 
+	 * @return void
+	 */
+	public function best_answer($id_msg) : void
+	{
+		global $smcFunc, $modSettings, $board;
+
+		// Can we solve in this board?
+		if (!in_array($board, explode(',', $modSettings['TopicSolved_boards_can_solve'])))
+			return;
+
+		// Find the topic from this msg
+		$request = $smcFunc['db_query']('', '
+			SELECT m.id_topic
+			FROM {db_prefix}messages AS m
+			WHERE m.id_msg = {int:id_msg}',
+			[
+				'id_msg' => $id_msg,
+			]
+		);
+		$topic = $smcFunc['db_fetch_assoc']($request);
+		$smcFunc['db_free_result']($request);
+
+		// Mark the topic as solved
+		$smcFunc['db_query']('', '
+			UPDATE {db_prefix}topics AS t
+			SET is_solved = 1
+			WHERE t.id_topic = {int:topic}',
+			[
+				'topic' => $topic['id_topic'],
+			]
+		);
 	}
 }

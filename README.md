@@ -14,6 +14,7 @@ Topic Solved mod provides a very basic functionality to mark topics as solved.
   - Solve own topics
 - Select boards where it applies
 - Color the solved topics in messageindex
+- Integration with [Best Answer](https://github.com/SychO9/smf-best-answer)
 
 ### Localization
 - ![English](https://www.simplemachines.org/site_images/lang/english.gif) English
