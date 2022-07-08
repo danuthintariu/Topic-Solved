@@ -8,11 +8,13 @@
  */
 
 // Main
+$txt['TopicSolved_settings'] = 'Topic Solved Settings';
 $txt['TopicSolved_mark_solved'] = 'Mark Solved';
 $txt['TopicSolved_mark_unsolved'] = 'Mark Unsolved';
 
 // Boards
 $txt['TopicSolved_board_solve'] = 'Can mark topics as solved';
+$txt['TopicSolved_boards_select'] = 'Select boards where you can mark topics as solved';
 
 // Error
 $txt['TopicSolved_error_no_topic'] = 'No topic specified';
