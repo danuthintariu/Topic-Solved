@@ -1,0 +1,33 @@
+/**
+ * @package Topic Solved
+ * @version 1.0
+ * @author Diego Andrés <diegoandres_cortes@outlook.com>
+ * @copyright Copyright (c) 2022, SMF Tricks
+ */
+
+.windowbg.solved:not(.sticky, .locked) {
+	background: #c5edc5;
+}
+.windowbg.solved > .board_icon img {
+	display: none;
+}
+.windowbg.solved > .board_icon::before {
+	text-align: center;
+	content: "";
+	width: 16px;
+	height: 16px;
+	display: inline-block;
+	background: url(../images/icons/main_icons_sprite.png) no-repeat -5px -5px / 260px auto;
+	vertical-align: middle;
+	background-position: -239px -213px;
+}
+.buttonlist a.topic_solve,
+.buttonlist a.topic_unsolve {
+	font-weight: 700;
+}
+.buttonlist a.topic_solve {
+	color: #008000;
+}
+.buttonlist a.topic_unsolve {
+	color: #ff0000;
+}

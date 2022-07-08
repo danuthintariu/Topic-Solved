@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE package-info SYSTEM "http://www.simplemachines.org/xml/package-info">
+<package-info xmlns="http://www.simplemachines.org/xml/package-info" xmlns:smf="http://www.simplemachines.org/">
+	<id>smftricks:topic_solved</id>
+	<name>Topic Solved</name>
+	<version>1.0</version>
+	<type>modification</type>
+	<install for="2.1 - 2.1.99">
+		<!-- Mod Readme -->
+		<readme lang="english" parsebbc="true" type="file">readme/readme.english.txt</readme>
+		<!-- Source Files -->
+		<require-file name="Sources/Class-TopicSolved.php" destination="$sourcedir">Source Files</require-file>
+		<!-- Theme Files -->
+		<require-dir name="Themes" destination="$boarddir">Theme Files</require-dir>
+		<!-- Hooks -->
+		<hook hook="integrate_pre_load" function="TopicSolved::hooks" file="$sourcedir/Class-TopicSolved.php" />
+		<!-- Database -->
+		<database>database.php</database>
+	</install>
+	<uninstall for="2.1 - 2.1.99">
+		<!-- Source Files -->
+		<remove-file name="$sourcedir/Class-TopicSolved.php">Source Files</remove-file>
+		<!-- CSS File -->
+		<remove-file name="$themedir/css/topicsolved.css">CSS File</remove-file>
+		<!-- Language Files -->
+		<remove-dir name="$languagedir/TopicSolved">Language Files</remove-dir>
+		<!-- Hooks -->
+		<hook hook="integrate_pre_load" function="TopicSolved::hooks" file="$sourcedir/Class-TopicSolved.php" remove="true" />
+		<!-- Database -->
+		<database>database.php</database>
+	</uninstall>
+</package-info>
