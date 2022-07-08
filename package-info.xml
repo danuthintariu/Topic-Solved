@@ -16,6 +16,8 @@
 		<hook hook="integrate_pre_load" function="TopicSolved::hooks" file="$sourcedir/Class-TopicSolved.php" />
 		<!-- Database -->
 		<database>database.php</database>
+		<!-- Redirect to master setting -->
+		<redirect url="?action=admin;area=modsettings" timeout="3000" />
 	</install>
 	<uninstall for="2.1 - 2.1.99">
 		<!-- Source Files -->
