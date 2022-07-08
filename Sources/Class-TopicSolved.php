@@ -37,6 +37,25 @@ class TopicSolved
 		// Permissions
 		add_integration_function('integrate_load_permissions', __CLASS__ . '::permissions#', false, $sourcedir . '/Class-TopicSolved.php');
 		add_integration_function('integrate_helpadmin', __CLASS__ . '::language#', false, $sourcedir . '/Class-TopicSolved.php');
+
+		// Settings
+		add_integration_function('integrate_general_mod_settings', __CLASS__ . '::settings#', false, $sourcedir . '/Class-TopicSolved.php');
+	}
+
+	/**
+	 * Mod Settings. A cheat setting to select boards.
+	 * 
+	 * @return void
+	 */
+	public static function settings(&$config_vars)
+	{
+		global $txt;
+
+		if (!empty($config_vars))
+			$config_vars[] = '';
+
+		$config_vars[] = ['title', 'TopicSolved_settings'];
+		$config_vars[] = ['boards', 'TopicSolved_boards_can_solve', 'label' => $txt['TopicSolved_boards_select']];
 	}
 
 	/**
