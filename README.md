@@ -6,7 +6,7 @@
 Developed by [Diego Andrés](https://github.com/DiegoAndresCortes)
 
 ## Introduction
-SMF Post Prefix mod allows you to set prefixes for your topics and easily customize them with colors and icons.
+Topic Solved mod provides a very basic functionality to mark topics as solved.
 
 ### Features
 - Permissions
