@@ -3,7 +3,7 @@
 <package-info xmlns="http://www.simplemachines.org/xml/package-info" xmlns:smf="http://www.simplemachines.org/">
 	<id>smftricks:topic_solved</id>
 	<name>Topic Solved</name>
-	<version>1.0</version>
+	<version>1.0.1</version>
 	<type>modification</type>
 	<install for="2.1 - 2.1.99">
 		<!-- Mod Readme -->
@@ -27,7 +27,7 @@
 		<!-- Language Files -->
 		<remove-dir name="$languagedir/TopicSolved">Language Files</remove-dir>
 		<!-- Hooks -->
-		<hook hook="integrate_pre_load" function="TopicSolved::hooks" file="$sourcedir/Class-TopicSolved.php" remove="true" />
+		<hook hook="integrate_pre_load" function="TopicSolved::hooks" file="$sourcedir/Class-TopicSolved.php" reverse="true" />
 		<!-- Database -->
 		<database>database.php</database>
 	</uninstall>
