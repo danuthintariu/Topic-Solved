@@ -19,6 +19,7 @@ Topic Solved mod provides a very basic functionality to mark topics as solved.
 ### Localization
 - ![English](https://www.simplemachines.org/site_images/lang/english.gif) English
 - ![Russian](https://www.simplemachines.org/site_images/lang/russian.gif) Russian by [Bugo](https://www.simplemachines.org/community/index.php?action=profile;u=229017)
+- ![Romanian](https://www.simplemachines.org/site_images/lang/romanian.gif) Romanian by [Aimond](https://www.simplemachines.org/community/index.php?action=profile;u=654752)
 ---
 ### [Changelog](https://github.com/SMFTricks/Topic-Solved/blob/main/CHANGELOG.md)
 ### [GitHub](https://github.com/SMFTricks/Topic-Solved)
