@@ -1,6 +1,6 @@
 # Changelog
 
-#### 1.1 - 13 July 2022
+#### 1.1 - 15 October 2022
 - ![Bug Fix](https://smftricks.com/assets/changelog/bug--minus.png) Fixed setting not updating the boards inputs.
 
 #### 1.0.2 - 13 July 2022
