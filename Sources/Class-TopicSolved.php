@@ -2,7 +2,7 @@
 
 /**
  * @package Topic Solved
- * @version 1.0
+ * @version 1.1
  * @author Diego Andrés <diegoandres_cortes@outlook.com>
  * @copyright Copyright (c) 2022, SMF Tricks
  */
@@ -52,13 +52,38 @@ class TopicSolved
 	 */
 	public static function settings(&$config_vars)
 	{
-		global $txt;
+		global $txt, $smcFunc, $modSettings;
 
 		if (!empty($config_vars))
 			$config_vars[] = '';
 
 		$config_vars[] = ['title', 'TopicSolved_settings'];
 		$config_vars[] = ['boards', 'TopicSolved_boards_can_solve', 'label' => $txt['TopicSolved_boards_select']];
+
+		// Set those boards to be able to solve topics when saving this setting...
+		if (isset($_REQUEST['save']))
+		{
+			// Boards that can solve topics
+			$smcFunc['db_query']('', '
+				UPDATE {db_prefix}boards
+				SET can_solve = {int:TopicSolved}',
+				[
+					'boards' => !empty($_REQUEST['TopicSolved_boards_can_solve']) ? array_keys($_REQUEST['TopicSolved_boards_can_solve']) : [],
+					'TopicSolved' => 1,
+				]
+			);
+
+			// Boards that can't solve topics
+			$smcFunc['db_query']('', '
+				UPDATE {db_prefix}boards
+				SET can_solve = {int:TopicSolved}
+				WHERE id_board NOT IN ({array_int:boards})',
+				[
+					'boards' => !empty($_REQUEST['TopicSolved_boards_can_solve']) ? array_keys($_REQUEST['TopicSolved_boards_can_solve']) : [],
+					'TopicSolved' => 0,
+				]
+			);
+		}
 	}
 
 	/**
@@ -255,7 +280,7 @@ class TopicSolved
 			$boardUpdates[] = 'can_solve = {int:can_solve}';
 			$boardUpdateParameters['can_solve'] = $boardOptions['can_solve'] ? 1 : 0;
 
-			// Add the board to the boards that require prefixes, if it's not there already
+			// Add the board to the boards that can solve topics, if it's not there already
 			if (!empty($boardOptions['can_solve']) && !in_array($id, explode(',', $modSettings['TopicSolved_boards_can_solve'])))
 				updateSettings(['TopicSolved_boards_can_solve' => !empty($modSettings['TopicSolved_boards_can_solve']) ? implode(',', array_merge(explode(',', $modSettings['TopicSolved_boards_can_solve']), [$id])) : $id]);
 			// Remove the board from the required boards, if it's there

@@ -1,5 +1,8 @@
 # Changelog
 
+#### 1.1 - 13 July 2022
+- ![Bug Fix](https://smftricks.com/assets/changelog/bug--minus.png) Fixed setting not updating the boards inputs.
+
 #### 1.0.2 - 13 July 2022
 - ![Translation](https://smftricks.com/assets/changelog/language.png) Russian translation provided by [Bugo](https://www.simplemachines.org/community/index.php?action=profile;u=229017)
 
