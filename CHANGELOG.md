@@ -1,8 +1,11 @@
 # Changelog
 
+#### 1.1.1 - 20 February 2023
+- ![Translation](https://smftricks.com/assets/changelog/language.png) Italian translation provided by [ParmaU](https://github.com/ParmaU)
+
 #### 1.1 - 15 October 2022
 - ![Bug Fix](https://smftricks.com/assets/changelog/bug--minus.png) Fixed setting not updating the boards inputs.
-
+---
 #### 1.0.2 - 13 July 2022
 - ![Translation](https://smftricks.com/assets/changelog/language.png) Russian translation provided by [Bugo](https://www.simplemachines.org/community/index.php?action=profile;u=229017)
 

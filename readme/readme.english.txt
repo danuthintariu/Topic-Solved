@@ -26,6 +26,7 @@
 [size=3][color=#358234]Localization[/color][/size]
 [img]https://www.simplemachines.org/site_images/lang/english.gif[/img] English
 [img]https://www.simplemachines.org/site_images/lang/russian.gif[/img] Russian by [url="https://www.simplemachines.org/community/index.php?action=profile;u=229017"]Bugo[/url]
+[img]https://www.simplemachines.org/site_images/lang/italian.gif[/img] Italian by [url="https://github.com/ParmaU"]ParmaU[/url]
 [hr]
 
 [size=3][url="https://github.com/SMFTricks/Topic-Solved/blob/main/CHANGELOG.md"][color=#cc5d31]Changelog[/color][/url][/size]
