@@ -5,7 +5,7 @@
  * @copyright Copyright (c) 2022, SMF Tricks
  */
 
-.windowbg.solved:not(.sticky, .locked) {
+.windowbg.solved:not(.sticky, .locked, .approvetopic) {
 	background: #c5edc5;
 }
 .windowbg.solved > .board_icon img {

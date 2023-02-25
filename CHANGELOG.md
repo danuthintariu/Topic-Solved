@@ -1,5 +1,8 @@
 # Changelog
 
+#### 1.1.2 - 24 February 2023
+- ![Bug Fix](https://smftricks.com/assets/changelog/bug--minus.png) Don't replace the approve class for unapproved topics.
+
 #### 1.1.1 - 20 February 2023
 - ![Translation](https://smftricks.com/assets/changelog/language.png) Italian translation provided by [ParmaU](https://github.com/ParmaU)
 
