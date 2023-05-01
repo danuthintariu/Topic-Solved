@@ -1,5 +1,8 @@
 # Changelog
 
+#### 1.1.3 - 24 April 2023
+- ![Translation](https://smftricks.com/assets/changelog/language.png) Romanian translation provided by [Aimond](https://www.simplemachines.org/community/index.php?action=profile;u=654752)
+
 #### 1.1.2 - 24 February 2023
 - ![Bug Fix](https://smftricks.com/assets/changelog/bug--minus.png) Don't replace the approve class for unapproved topics.
 
