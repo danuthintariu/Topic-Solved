@@ -7,7 +7,7 @@
 	<type>modification</type>
 	<install for="2.1 - 2.1.99">
 		<!-- Mod Readme -->
-		<readme lang="english" parsebbc="true" type="file">readme/readme.english.txt</readme>
+		<readme lang="english" parsebbc="true" type="file">readme.txt</readme>
 		<!-- Source Files -->
 		<require-file name="Sources/Class-TopicSolved.php" destination="$sourcedir">Source Files</require-file>
 		<!-- Theme Files -->
