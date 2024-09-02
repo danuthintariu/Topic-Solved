@@ -10,6 +10,10 @@
 class TopicSolved
 {
 	public static function hooks()
+	/**
+	 * @var array The array of boards using topic solved
+	 */
+	private array $boards = [];
 	{
 		global $sourcedir, $modSettings;
 
@@ -61,29 +65,33 @@ class TopicSolved
 		$config_vars[] = ['boards', 'TopicSolved_boards_can_solve', 'label' => $txt['TopicSolved_boards_select']];
 
 		// Set those boards to be able to solve topics when saving this setting...
-		if (isset($_REQUEST['save']))
-		{
-			// Boards that can solve topics
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}boards
-				SET can_solve = {int:TopicSolved}',
-				[
-					'boards' => !empty($_REQUEST['TopicSolved_boards_can_solve']) ? array_keys($_REQUEST['TopicSolved_boards_can_solve']) : [],
-					'TopicSolved' => 1,
-				]
-			);
-
-			// Boards that can't solve topics
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}boards
-				SET can_solve = {int:TopicSolved}
-				WHERE id_board NOT IN ({array_int:boards})',
-				[
-					'boards' => !empty($_REQUEST['TopicSolved_boards_can_solve']) ? array_keys($_REQUEST['TopicSolved_boards_can_solve']) : [],
-					'TopicSolved' => 0,
-				]
-			);
+		if (!isset($_REQUEST['save'])) {
+			return;
 		}
+
+		// Setup the boards for the array
+		$this->boards = isset($_REQUEST['TopicSolved_boards_can_solve']) ? array_keys($_REQUEST['TopicSolved_boards_can_solve']) : [0];
+
+		// Boards that can solve topics
+		$smcFunc['db_query']('', '
+			UPDATE {db_prefix}boards
+			SET can_solve = {int:TopicSolved}',
+			[
+				'boards' => $this->boards,
+				'TopicSolved' => 1,
+			]
+		);
+
+		// Boards that can't solve topics
+		$smcFunc['db_query']('', '
+			UPDATE {db_prefix}boards
+			SET can_solve = {int:TopicSolved}
+			WHERE id_board NOT IN ({array_int:boards})',
+			[
+				'boards' => $this->boards,
+				'TopicSolved' => 0,
+			]
+		);
 	}
 
 	/**
