@@ -13,7 +13,7 @@
 		<!-- Theme Files -->
 		<require-dir name="Themes" destination="$boarddir">Theme Files</require-dir>
 		<!-- Hooks -->
-		<hook hook="integrate_pre_load" function="TopicSolved::hooks" file="$sourcedir/Class-TopicSolved.php" />
+		<hook hook="integrate_pre_load" function="TopicSolved::hooks#" file="$sourcedir/Class-TopicSolved.php" />
 		<!-- Database -->
 		<database>database.php</database>
 		<!-- Redirect to master setting -->
@@ -27,7 +27,7 @@
 		<!-- Language Files -->
 		<remove-dir name="$languagedir/TopicSolved">Language Files</remove-dir>
 		<!-- Hooks -->
-		<hook hook="integrate_pre_load" function="TopicSolved::hooks" file="$sourcedir/Class-TopicSolved.php" reverse="true" />
+		<hook hook="integrate_pre_load" function="TopicSolved::hooks#" file="$sourcedir/Class-TopicSolved.php" reverse="true" />
 		<!-- Database -->
 		<database>database.php</database>
 	</uninstall>

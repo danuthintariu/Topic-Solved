@@ -2,18 +2,22 @@
 
 /**
  * @package Topic Solved
- * @version 1.1
+ * @version 1.1.4
  * @author Diego Andrés <diegoandres_cortes@outlook.com>
- * @copyright Copyright (c) 2022, SMF Tricks
+ * @copyright Copyright (c) 2024, SMF Tricks
  */
 
 class TopicSolved
 {
-	public static function hooks()
 	/**
 	 * @var array The array of boards using topic solved
 	 */
 	private array $boards = [];
+
+	/**
+	 * Load the hooks used by the mod
+	 */
+	public function hooks() : void
 	{
 		global $sourcedir, $modSettings;
 
@@ -52,11 +56,11 @@ class TopicSolved
 	/**
 	 * Mod Settings. A cheat setting to select boards.
 	 * 
-	 * @return void
+	 * @param array $config_vars: The config vars for the settings
 	 */
-	public static function settings(&$config_vars)
+	public function settings(array &$config_vars) : void
 	{
-		global $txt, $smcFunc, $modSettings;
+		global $txt, $smcFunc;
 
 		if (!empty($config_vars))
 			$config_vars[] = '';
@@ -97,9 +101,9 @@ class TopicSolved
 	/**
 	 * Add the action to mark a topic as solved or unsolved
 	 * 
-	 * @return void
+	 * @param array $actions: The forum actions
 	 */
-	public function actions(&$actions) : void
+	public function actions(array &$actions) : void
 	{
 		$actions['topicsolve'] = ['Class-TopicSolved.php', __CLASS__ . '::solve#'];
 	}
@@ -114,8 +118,6 @@ class TopicSolved
 
 	/**
 	 * Mark a topic as solved or unsolved
-	 * 
-	 * @return void
 	 */
 	public function solve() : void
 	{
@@ -176,17 +178,15 @@ class TopicSolved
 	/**
 	 * Add the solved column to the message index
 	 * 
-	 * @return void
+	 * @param array $message_index_selects: The columns to select
 	 */
-	public function message_index(&$message_index_selects) : void
+	public function message_index(array &$message_index_selects) : void
 	{
 		$message_index_selects[] = 't.is_solved';
 	}
 
 	/**
 	 * Add the class to the solved topics
-	 * 
-	 * @return void
 	 */
 	public function topic_class() : void
 	{
@@ -203,10 +203,12 @@ class TopicSolved
 		// Load css file for this
 		loadCSSFile('topicsolved.css', ['default_theme' => true, 'minimize' => true], 'smf_topic_solved');
 
-		foreach ($context['topics'] as $topic)
-			// Is the topic solved?
-			if ($topic['is_solved'])
+		// Is the topic solved?
+		foreach ($context['topics'] as $topic) {
+			if ($topic['is_solved']) {
 				$context['topics'][$topic['id']]['css_class'] .= ' solved';
+			}
+		}
 	}
 
 	/**
@@ -275,9 +277,12 @@ class TopicSolved
 	/**
 	 * Modify Boards
 	 * 
-	 * @return void
+	 * @param int $id: The board id
+	 * @param array $boardOptions: The options for the board
+	 * @param array $boardUpdates: The columns being updated
+	 * @param array $boardUpdateParameters: The values for the columns
 	 */
-	public function modify_boards($id, $boardOptions, &$boardUpdates, &$boardUpdateParameters) : void
+	public function modify_boards(int $id, array $boardOptions, array &$boardUpdates, array &$boardUpdateParameters) : void
 	{
 		global $modSettings;
 
@@ -300,10 +305,8 @@ class TopicSolved
 
 	/**
 	 * Edit board
-	 * 
-	 * @return void
 	 */
-	public function edit_board()
+	public function edit_board() : void
 	{
 		global $context, $txt;
 
@@ -316,7 +319,7 @@ class TopicSolved
 	/**
 	 * Permissions
 	 * 
-	 * @return void
+	 * @param array $permissionList: The list of permissions
 	 */
 	public function permissions(&$permissionGroups, &$permissionList, &$leftPermissionGroups, &$hiddenPermissions, &$relabelPermissions) : void
 	{
@@ -328,9 +331,9 @@ class TopicSolved
 	 * 
 	 * Mark the topic as solved after the best answer is chosen
 	 * 
-	 * @return void
+	 * @param int $id_msg: The id of the mssage
 	 */
-	public function best_answer($id_msg) : void
+	public function best_answer(int $id_msg) : void
 	{
 		global $smcFunc, $modSettings, $board;
 
