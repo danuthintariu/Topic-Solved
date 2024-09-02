@@ -282,19 +282,20 @@ class TopicSolved
 		global $modSettings;
 
 		$boardOptions['can_solve'] = isset($_POST['TopicSolved_board_solve']);
+		$boardUpdates[] = 'can_solve = {int:can_solve}';
+		$boardUpdateParameters['can_solve'] = $boardOptions['can_solve'] ? 1 : 0;
 
-		if (isset($boardOptions['can_solve']))
-		{
-			$boardUpdates[] = 'can_solve = {int:can_solve}';
-			$boardUpdateParameters['can_solve'] = $boardOptions['can_solve'] ? 1 : 0;
+		// Get the boards
+		$solvedBoards = explode(',', $modSettings['TopicSolved_boards_can_solve']);
 
-			// Add the board to the boards that can solve topics, if it's not there already
-			if (!empty($boardOptions['can_solve']) && !in_array($id, explode(',', $modSettings['TopicSolved_boards_can_solve'])))
-				updateSettings(['TopicSolved_boards_can_solve' => !empty($modSettings['TopicSolved_boards_can_solve']) ? implode(',', array_merge(explode(',', $modSettings['TopicSolved_boards_can_solve']), [$id])) : $id]);
-			// Remove the board from the required boards, if it's there
-			elseif (empty($boardOptions['can_solve']) && in_array($id, explode(',', $modSettings['TopicSolved_boards_can_solve'])))
-				updateSettings(['TopicSolved_boards_can_solve' => implode(',', array_diff(explode(',', $modSettings['TopicSolved_boards_can_solve']), [$id]))], true);
-		}		
+		// Add the board to the boards that can solve topics, if it's not there already
+		if (!empty($boardOptions['can_solve']) && !in_array($id, $solvedBoards)) {
+			updateSettings(['TopicSolved_boards_can_solve' => !empty($modSettings['TopicSolved_boards_can_solve']) ? implode(',', array_merge($solvedBoards, [$id])) : $id]);
+		}
+		// Remove the board from the required boards, if it's there
+		elseif (empty($boardOptions['can_solve']) && in_array($id, $solvedBoards)) {
+			updateSettings(['TopicSolved_boards_can_solve' => implode(',', array_diff($solvedBoards, [$id]))], true);
+		}
 	}
 
 	/**
