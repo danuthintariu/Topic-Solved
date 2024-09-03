@@ -32,6 +32,7 @@ You can find detailed instructions and/or more documentation about the process i
 [img]https://www.simplemachines.org/site_images/lang/russian.gif[/img] Russian by [url="https://www.simplemachines.org/community/index.php?action=profile;u=229017"]Bugo[/url]
 [img]https://www.simplemachines.org/site_images/lang/italian.gif[/img] Italian by [url="https://github.com/ParmaU"]ParmaU[/url]
 [img]https://www.simplemachines.org/site_images/lang/romanian.gif[/img] Romanian by [url="https://www.simplemachines.org/community/index.php?action=profile;u=654752"]Aimond[/url]
+[img]https://www.simplemachines.org/site_images/lang/romanian.gif[/img] German by [url="https://www.simplemachines.org/community/index.php?action=profile;u=85862"]Ruediger63[/url]
 
 You can contribute with your translation by sending a Pull Request to the [url=https://github.com/SMFTricks/Topic-Solved]GitHub[/url] repository.
 

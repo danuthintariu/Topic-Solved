@@ -24,6 +24,7 @@ You can find detailed instructions and/or more documentation about the process i
 - ![Russian](https://www.simplemachines.org/site_images/lang/russian.gif) Russian by [Bugo](https://www.simplemachines.org/community/index.php?action=profile;u=229017)
 - ![Italian](https://www.simplemachines.org/site_images/lang/italian.gif) Italian by [ParmaU](https://github.com/ParmaU)
 - ![Romanian](https://www.simplemachines.org/site_images/lang/romanian.gif) Romanian by [Aimond](https://www.simplemachines.org/community/index.php?action=profile;u=654752)
+- ![German](https://www.simplemachines.org/site_images/lang/german.gif) German by [Ruediger63](https://www.simplemachines.org/community/index.php?action=profile;u=85862)
 
 ## 🔨 Changelog
 Review the changes and patches from the different releases/versions of the package in the [Changelog](https://github.com/SMFTricks/Topic-Solved/blob/main/CHANGELOG.md).

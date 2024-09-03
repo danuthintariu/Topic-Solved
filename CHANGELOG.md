@@ -1,5 +1,8 @@
 # Changelog
 
+#### 1.1.5 - 03 September 2024
+- ![Translation](https://smftricks.com/assets/changelog/language.png) German translation provided by [Ruediger63](https://www.simplemachines.org/community/index.php?action=profile;u=85862)
+
 #### 1.1.4 - 02 September 2024
 - ![Bug Fix](https://smftricks.com/assets/changelog/bug--minus.png) Fixed issue when saving settings with no boards selected.
 - ![Improvement](https://smftricks.com/assets/changelog/tag--pencil.png) Minor code improvements.
