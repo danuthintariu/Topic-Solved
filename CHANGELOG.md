@@ -1,5 +1,8 @@
 # Changelog
 
+#### 1.1.6 - 06 September 2024
+- ![Translation](https://smftricks.com/assets/changelog/language.png) Portuguese (PT) translation provided by [marcosbr](https://www.simplemachines.org/community/index.php?action=profile;u=391884)
+
 #### 1.1.5 - 03 September 2024
 - ![Translation](https://smftricks.com/assets/changelog/language.png) German translation provided by [Ruediger63](https://www.simplemachines.org/community/index.php?action=profile;u=85862)
 
