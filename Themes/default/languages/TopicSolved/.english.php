@@ -2,7 +2,7 @@
 
 /**
  * @package Topic Solved
- * @version 1.0
+ * @version 1.2
  * @author Diego Andrés <diegoandres_cortes@outlook.com>
  * @copyright Copyright (c) 2022, SMF Tricks
  */
@@ -27,3 +27,10 @@ $txt['permissionname_solve_topics'] = 'Mark topics as solved';
 $txt['permissionname_solve_topics_own'] = 'Mark their own topics as solved';
 $txt['permissionname_solve_topics_any'] = 'Mark any topic as solved';
 $txt['permissionhelp_solve_topics'] = 'This permission allows a user to mark a topic as solved';
+
+// Settings
+$txt['TopicSolved_automove_enable'] = 'Enable auto moving solved topics to specfic boards';
+$txt['TopicSolved_automove_enable_desc'] = 'You can select the boards for each board when editing or adding boards within the forum admin.';
+$txt['TopicSolved_automove_where'] = 'Select destination board for auto moving solved topics';
+$txt['TopicSolved_automove_where_desc'] = 'When no board is selected, the topics will remain in the same board after being marked as solved.';
+$txt['TopicSolved_indicatorclass_disable'] = 'Disable color and icon indicators for solved topics';
