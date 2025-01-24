@@ -16,35 +16,12 @@ elseif (!defined('SMF'))
 
 db_extend('packages');
 
-// Add a column to the topics table
-$smcFunc['db_add_column'](
-	'{db_prefix}topics', 
-	[
-		'name' => 'is_solved',
-		'type' => 'tinyint',
-		'default' => 0,
-		'unsigned' => true,
-		'not_null' => true,
-	]
-);
 // Add a column for remembering the origin of the solved topic
 $smcFunc['db_add_column'](
 	'{db_prefix}topics',
 	[
 		'name' => 'solved_board',
 		'type' => 'smallint',
-		'default' => 0,
-		'unsigned' => true,
-		'not_null' => true,
-	]
-);
-
-// Add a column to the boards table
-$smcFunc['db_add_column'](
-	'{db_prefix}boards', 
-	[
-		'name' => 'can_solve',
-		'type' => 'tinyint',
 		'default' => 0,
 		'unsigned' => true,
 		'not_null' => true,
