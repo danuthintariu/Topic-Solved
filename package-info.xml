@@ -3,8 +3,19 @@
 <package-info xmlns="http://www.simplemachines.org/xml/package-info" xmlns:smf="http://www.simplemachines.org/">
 	<id>smftricks:topic_solved</id>
 	<name>Topic Solved</name>
-	<version>1.1.6</version>
+	<version>1.2</version>
 	<type>modification</type>
+
+	<upgrade from="1.0.*, 1.1.*" for="2.1.*">
+		<!-- Source Files -->
+		<require-file name="Sources/Class-TopicSolved.php" destination="$sourcedir">Source Files</require-file>
+		<!-- Theme Files -->
+		<require-dir name="Themes" destination="$boarddir">Theme Files</require-dir>
+		<!-- Upgrade operations -->
+		<database>upgrade.php</database>
+	</upgrade>
+
+
 	<install for="2.1 - 2.1.99">
 		<!-- Mod Readme -->
 		<readme lang="english" parsebbc="true" type="file">readme.txt</readme>

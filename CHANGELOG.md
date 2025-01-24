@@ -1,5 +1,9 @@
 # Changelog
 
+#### 1.2 - 25 January 2025
+- ![New Feature](https://smftricks.com/assets/changelog/tag--plus.png) Each board can now auto-move solved topics to a different board.
+- ![New Feature](https://smftricks.com/assets/changelog/tag--plus.png) Added setting to disable color and icon indicators for solved topics.
+---
 #### 1.1.6 - 06 September 2024
 - ![Translation](https://smftricks.com/assets/changelog/language.png) Portuguese (PT) translation provided by [marcosbr](https://www.simplemachines.org/community/index.php?action=profile;u=391884)
 
