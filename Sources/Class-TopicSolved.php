@@ -360,7 +360,7 @@ class TopicSolved
 		global $sourcedir, $context, $txt;
 
 		require_once($sourcedir . '/Subs-MessageIndex.php');
-		$board_list = getBoardList(['not_redirection' => true]);
+		$board_list = getBoardList(['not_redirection' => true, 'excluded_boards' => [$context['board']['id']]]);
 		
 		$boards_select = '<select id="TopicSolved_solved_destination" name="TopicSolved_solved_destination">
 				<option value="0">' . $txt['none'] . '</option>';
