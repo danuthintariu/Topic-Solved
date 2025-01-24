@@ -2,9 +2,9 @@
 
 /**
  * @package Topic Solved
- * @version 1.1.4
+ * @version 1.2
  * @author Diego Andrés <diegoandres_cortes@outlook.com>
- * @copyright Copyright (c) 2024, SMF Tricks
+ * @copyright Copyright (c) 2025, SMF Tricks
  */
 
 class TopicSolved
@@ -67,6 +67,8 @@ class TopicSolved
 
 		$config_vars[] = ['title', 'TopicSolved_settings'];
 		$config_vars[] = ['boards', 'TopicSolved_boards_can_solve', 'label' => $txt['TopicSolved_boards_select']];
+		$config_vars[] = ['check', 'TopicSolved_indicatorclass_disable'];
+		$config_vars[] = ['check', 'TopicSolved_automove_enable', 'subtext' => $txt['TopicSolved_automove_enable_desc']];
 
 		// Set those boards to be able to solve topics when saving this setting...
 		if (!isset($_REQUEST['save'])) {
@@ -127,16 +129,18 @@ class TopicSolved
 		$this->language();
 		
 		// We need a topic id
-		if (!isset($_REQUEST['topic']) || empty($_REQUEST['topic']))
+		if (!isset($_REQUEST['topic']) || empty($_REQUEST['topic'])) {
 			fatal_lang_error('TopicSolved_error_no_topic', false);
+		}
 
 		checkSession('get');
 
 		// Get the topic
 		$request = $smcFunc['db_query']('', '
-			SELECT t.id_topic, t.is_solved, t.id_first_msg, t.id_board, m.id_member
+			SELECT t.id_topic, t.is_solved, t.id_first_msg, t.id_board, t.solved_board, m.id_member, b.solved_destination
 			FROM {db_prefix}topics AS t
 				LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
+				LEFT JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
 			WHERE t.id_topic = {int:topic}',
 			[
 				'topic' => (int) $_REQUEST['topic'],
@@ -146,30 +150,39 @@ class TopicSolved
 		$smcFunc['db_free_result']($request);
 
 		// Check if the topic exists
-		if (empty($topic_info))
+		if (empty($topic_info)) {
 			fatal_lang_error('TopicSolved_error_no_topic', false);
+		}
 
 		// Can they solve in this board?
-		if (!in_array($topic_info['id_board'], explode(',', $modSettings['TopicSolved_boards_can_solve'])))
+		if (!in_array($topic_info['id_board'], explode(',', $modSettings['TopicSolved_boards_can_solve']))) {
 			fatal_lang_error('TopicSolved_error_no_board', false);
+		}
 
 		// Do you have permission to solve this topic?
 		$user_solve = !allowedTo('solve_topics_any');
-		if ($user_solve && $topic_info['id_member'] == $user_info['id'])
+		if ($user_solve && $topic_info['id_member'] == $user_info['id']) {
 			isAllowedTo('solve_topics_own');
-		else
+		} else {
 			isAllowedTo('solve_topics_any');
+		}
 
 		// Solve or unsolve...
 		$smcFunc['db_query']('', '
 			UPDATE {db_prefix}topics
-			SET is_solved = {int:is_solved}
+			SET
+				is_solved = {int:is_solved}' . (!empty($modSettings['TopicSolved_automove_enable']) ? ',
+				solved_board = {int:solved_board}' : '' ) . '
 			WHERE id_topic = {int:topic}',
 			[
 				'is_solved' => $topic_info['is_solved'] ? 0 : 1,
 				'topic' => $topic_info['id_topic'],
+				'solved_board' => empty($topic_info['is_solved']) && empty($topic_info['solved_board']) ? $topic_info['id_board'] : 0,
 			]
 		);
+
+		// Auto-move topic?
+		$this->automove($topic_info['id_topic'], !empty($topic_info['solved_board']) ? $topic_info['solved_board'] : $topic_info['solved_destination'] ?? 0);
 
 		// We are done here
 		redirectexit('topic=' . $_REQUEST['topic'] . '.0');
@@ -178,7 +191,7 @@ class TopicSolved
 	/**
 	 * Add the solved column to the message index
 	 * 
-	 * @param array $message_index_selects: The columns to select
+	 * @param array The columns to select
 	 */
 	public function message_index(array &$message_index_selects) : void
 	{
@@ -192,13 +205,10 @@ class TopicSolved
 	{
 		global $context, $board, $modSettings;
 
-		// No topics, no fun.
-		if (empty($context['topics']))
+		// Check for topics, if solving is enabled, if indicators are enabled
+		if (empty($context['topics']) || !in_array($board, explode(',', $modSettings['TopicSolved_boards_can_solve'])) || !empty($modSettings['TopicSolved_indicatorclass_disable'])) {
 			return;
-
-		// Can we solve in this board?
-		if (!in_array($board, explode(',', $modSettings['TopicSolved_boards_can_solve'])))
-			return;
+		}
 
 		// Load css file for this
 		loadCSSFile('topicsolved.css', ['default_theme' => true, 'minimize' => true], 'smf_topic_solved');
@@ -214,9 +224,9 @@ class TopicSolved
 	/**
 	 * Add the solved column to the topic
 	 * 
-	 * @return void
+	 * @param array The columns being selected.
 	 */
-	public function display_topic(&$topic_selects) : void
+	public function display_topic(array &$topic_selects) : void
 	{
 		$topic_selects[] = 't.is_solved';
 	}
@@ -230,17 +240,15 @@ class TopicSolved
 	{
 		global $context, $scripturl, $modSettings, $board, $user_info;
 
-		// Check if it's available
-		if (!isset($context['topicinfo']['is_solved']))
+		// Check if it's available and can solve
+		if (!isset($context['topicinfo']['is_solved']) || !in_array($board, explode(',', $modSettings['TopicSolved_boards_can_solve']))) {
 			return;
-
-		// Can we solve in this board?
-		if (!in_array($board, explode(',', $modSettings['TopicSolved_boards_can_solve'])))
-			return;
+		}
 
 		// Can you solve topics?
-		if ((!allowedTo('solve_topics_any') && !allowedTo('solve_topics_own')) || (!allowedTo('solve_topics_any') && allowedTo('solve_topics_own') && $user_info['id'] != $context['topicinfo']['id_member_started']))
+		if ((!allowedTo('solve_topics_any') && !allowedTo('solve_topics_own')) || (!allowedTo('solve_topics_any') && allowedTo('solve_topics_own') && $user_info['id'] != $context['topicinfo']['id_member_started'])) {
 			return;
+		}
 
 		// Language
 		$this->language();
@@ -259,7 +267,13 @@ class TopicSolved
 	 */
 	public function pre_boardtree(&$boardColumns) : void
 	{
+		global $modSettings;
+	
 		$boardColumns[] = 'b.can_solve';
+
+		if (!empty($modSettings['TopicSolved_automove_enable'])) {
+			$boardColumns[] = 'b.solved_destination';
+		}
 	}
 
 	/**
@@ -269,9 +283,13 @@ class TopicSolved
 	 */
 	public function boardtree_board($row) : void
 	{
-		global $boards;
+		global $boards, $modSettings;
 
 		$boards[$row['id_board']]['can_solve'] = $row['can_solve'];
+
+		if (!empty($modSettings['TopicSolved_automove_enable'])) {
+			$boards[$row['id_board']]['solved_destination'] = $row['solved_destination'];
+		}
 	}
 
 	/**
@@ -286,13 +304,14 @@ class TopicSolved
 	{
 		global $modSettings;
 
+		// Mark topic as solved
 		$boardOptions['can_solve'] = isset($_POST['TopicSolved_board_solve']);
 		$boardUpdates[] = 'can_solve = {int:can_solve}';
 		$boardUpdateParameters['can_solve'] = $boardOptions['can_solve'] ? 1 : 0;
-
-		// Get the boards
+		
+		// Get the solved boards
 		$solvedBoards = explode(',', $modSettings['TopicSolved_boards_can_solve']);
-
+		
 		// Add the board to the boards that can solve topics, if it's not there already
 		if (!empty($boardOptions['can_solve']) && !in_array($id, $solvedBoards)) {
 			updateSettings(['TopicSolved_boards_can_solve' => !empty($modSettings['TopicSolved_boards_can_solve']) ? implode(',', array_merge($solvedBoards, [$id])) : $id]);
@@ -301,6 +320,13 @@ class TopicSolved
 		elseif (empty($boardOptions['can_solve']) && in_array($id, $solvedBoards)) {
 			updateSettings(['TopicSolved_boards_can_solve' => implode(',', array_diff($solvedBoards, [$id]))], true);
 		}
+
+		// Auto Move solved topic
+		if (!empty($modSettings['TopicSolved_automove_enable'])) {
+			$boardOptions['solved_destination'] = $_POST['TopicSolved_solved_destination'] ?? 0;
+			$boardUpdates[] = 'solved_destination = {int:solved_destination}';
+			$boardUpdateParameters['solved_destination'] = $boardOptions['solved_destination'] ?? 0;
+		}
 	}
 
 	/**
@@ -308,12 +334,50 @@ class TopicSolved
 	 */
 	public function edit_board() : void
 	{
-		global $context, $txt;
+		global $context, $txt, $modSettings;
 
 		$context['custom_board_settings']['can_solve'] = [
 			'dt' => '<label for="TopicSolved_board_solve"><strong>'. $txt['TopicSolved_board_solve']. '</strong></label>',
 			'dd' => '<input type="checkbox" id="TopicSolved_board_solve" name="TopicSolved_board_solve" class="input_check"'. (!empty($context['board']['can_solve']) ? ' checked="checked"' : ''). '>',
 		];
+
+		// Auto move solved topics
+		if (!empty($modSettings['TopicSolved_automove_enable'])) {
+			$context['custom_board_settings']['solved_destination'] = [
+				'dt' => '<label for="TopicSolved_solved_destination"><strong>'. $txt['TopicSolved_automove_where']. '</strong></label>',
+				'dd' => $this->boardsList(),
+			];
+		}
+	}
+
+	/**
+	 * Get a list of boards using SMF functions
+	 * 
+	 * @return string A formatted select HTML element with the forum boards.
+	 */
+	private function boardsList() : string
+	{
+		global $sourcedir, $context, $txt;
+
+		require_once($sourcedir . '/Subs-MessageIndex.php');
+		$board_list = getBoardList(['not_redirection' => true]);
+		
+		$boards_select = '<select id="TopicSolved_solved_destination" name="TopicSolved_solved_destination">
+				<option value="0">' . $txt['none'] . '</option>';
+
+		foreach ($board_list as $board_category) {
+			$boards_select .= '<optgroup label="' . $board_category['name'] . '">';
+
+			foreach ($board_category['boards'] as $board_option) {
+				$boards_select .= '<option value="' . $board_option['id'] . '" ' . (!empty($context['board']['solved_destination']) && $context['board']['solved_destination'] == $board_option['id'] ? ' selected' : '') . '>' . $board_option['name'] . '</option>';
+			}
+
+			$boards_select .= '</optgroup>';
+		}
+
+		$boards_select .= '</select>';
+
+		return $boards_select;
 	}
 
 	/**
@@ -338,8 +402,9 @@ class TopicSolved
 		global $smcFunc, $modSettings, $board;
 
 		// Can we solve in this board?
-		if (!in_array($board, explode(',', $modSettings['TopicSolved_boards_can_solve'])))
+		if (!in_array($board, explode(',', $modSettings['TopicSolved_boards_can_solve']))) {
 			return;
+		}
 
 		// Find the topic from this msg
 		$request = $smcFunc['db_query']('', '
@@ -362,5 +427,24 @@ class TopicSolved
 				'topic' => $topic['id_topic'],
 			]
 		);
+	}
+
+	/**
+	 * Auto move a solved topic
+	 * 
+	 * @param int topic_id The topic to move
+	 * @param int board_id The board to move the topic to
+	 */
+	private function automove(int $topicID, int $boardID) : void
+	{
+		global $modSettings, $sourcedir;
+
+		// Auto move is enabled and there is a board selected?
+		if (empty($modSettings['TopicSolved_automove_enable']) || empty($boardID)) {
+			return;
+		}
+
+		include_once($sourcedir . '/MoveTopic.php');
+		moveTopics($topicID, $boardID);
 	}
 }
