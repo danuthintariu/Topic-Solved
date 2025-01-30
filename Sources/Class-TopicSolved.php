@@ -171,7 +171,7 @@ class TopicSolved
 		$smcFunc['db_query']('', '
 			UPDATE {db_prefix}topics
 			SET
-				is_solved = {int:is_solved}' . (!empty($modSettings['TopicSolved_automove_enable']) ? ',
+				is_solved = {int:is_solved}' . (!empty($modSettings['TopicSolved_automove_enable']) && !empty($topic_info['solved_destination']) ? ',
 				solved_board = {int:solved_board}' : '' ) . '
 			WHERE id_topic = {int:topic}',
 			[
