@@ -182,7 +182,11 @@ class TopicSolved
 		);
 
 		// Auto-move topic?
-		$this->automove($topic_info['id_topic'], !empty($topic_info['solved_board']) ? $topic_info['solved_board'] : $topic_info['solved_destination'] ?? 0);
+		$destinationBoard = !empty($topic_info['solved_board']) ? $topic_info['solved_board'] : $topic_info['solved_destination'] ?? 0;
+		$this->automove($topic_info['id_topic'], $destinationBoard);
+		
+		// Log the action
+		logAction('solve', ['topic' => $topic_info['id_topic'], 'board' => $destinationBoard, 'solved' => $topic_info['is_solved'] ? 0 : 1], 'solved');
 
 		// We are done here
 		redirectexit('topic=' . $_REQUEST['topic'] . '.0');
