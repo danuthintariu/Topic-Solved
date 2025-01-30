@@ -189,7 +189,11 @@ class TopicSolved
 		logAction('solve', ['topic' => $topic_info['id_topic'], 'board' => $destinationBoard, 'solved' => $topic_info['is_solved'] ? 0 : 1], 'solved');
 
 		// We are done here
-		redirectexit('topic=' . $_REQUEST['topic'] . '.0');
+		if (empty($destinationBoard)) {
+			redirectexit('topic=' . $_REQUEST['topic'] . '.0');
+		} else {
+			redirectexit('board=' . $topic_info['id_board'] . '.0');
+		}
 	}
 
 	/**
