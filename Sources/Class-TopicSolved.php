@@ -15,6 +15,11 @@ class TopicSolved
 	private array $boards = [];
 
 	/**
+	 * @var int Solved log type
+	 */
+	private int $logType = 4;
+
+	/**
 	 * Load the hooks used by the mod
 	 */
 	public function hooks() : void
@@ -51,6 +56,10 @@ class TopicSolved
 
 		// Best Answer
 		add_integration_function('integrate_sycho_best_answer', __CLASS__ . '::best_answer#', false, $sourcedir . '/Class-TopicSolved.php');
+
+		// Moderation Center
+		add_integration_function('integrate_log_types', __CLASS__ . '::logTypes#', false, $sourcedir . '/Class-TopicSolved.php');
+		add_integration_function('integrate_moderate_areas', __CLASS__ . '::moderate#', false, $sourcedir . '/Class-TopicSolved.php');
 	}
 
 	/**
@@ -454,5 +463,286 @@ class TopicSolved
 
 		include_once($sourcedir . '/MoveTopic.php');
 		moveTopics($topicID, $boardID);
+	}
+
+	/**
+	 * Add solved log type
+	 * 
+	 * @param array The typs of logs
+	 */
+	public function logTypes(array &$log_types) : void
+	{
+		$log_types['solved'] = $this->logType;
+	}
+
+	/**
+	 * Modeartion center areas
+	 * 
+	 * @param array The moderation center areas menu
+	 */
+	public function moderate(array &$areas) : void
+	{
+		global $txt;
+
+		$this->language();
+
+		$areas['logs']['areas']['solvedlogs'] = [
+			'label' => $txt['TopicSolved_log'],
+			'icon' => 'valid',
+			'function' => [new self, 'logs'],
+		];
+	}
+
+	/**
+	 * Delete solved log entry
+	 */
+	private function delete() : void
+	{
+		global $smcFunc;
+
+		if (!isset($_POST['removeall']) && !isset($_POST['delete'])) {
+			return;
+		}
+
+		checkSession();
+		validateToken('mod-solved');
+		isAllowedTo('admin_forum');
+
+		if (isset($_POST['removeall'])) {
+			$this->deleteAll();
+		}
+
+		if (isset($_POST['delete']) && !empty($_POST['delete'])) {
+			$smcFunc['db_query']('', '
+				DELETE FROM {db_prefix}log_actions
+				WHERE id_log = {int:logtype}
+					AND id_action iN ({array_int:entries})
+					AND action = {string:action}',
+				[
+					'logtype' => $this->logType,
+					'action' => 'solve',
+					'entries' => array_unique($_POST['delete'])
+				]
+			);
+		}
+	}
+
+	/**
+	 * Delete all the solved log entries
+	 */
+	private function deleteAll() : void
+	{
+		global $smcFunc;
+
+		$smcFunc['db_query']('', '
+			DELETE FROM {db_prefix}log_actions
+			WHERE id_log = {int:logtype}
+				AND action = {string:action}',
+			[
+				'logtype' => $this->logType,
+				'action' => 'solve'
+			]
+		);
+
+		// Log this admin action
+		logAction('clearlog_solve', [], 'admin');
+	}
+
+	/**
+	 * Solved Topics log
+	 */
+	public function logs() : void
+	{
+		global $context, $txt, $sourcedir, $smcFunc, $scripturl;
+
+		// Deleting entries from the log?
+		$this->delete();
+
+		loadLanguage('Admin+Modlog');
+
+		$context['url_start'] = '?action=moderate;area=solvedlogs';
+		$context['page_title'] = $txt['TopicSolved_log'];
+		$context['can_delete'] = allowedTo('admin_forum');
+		$context[$context['moderation_menu_name']]['tab_data'] = [
+			'title' => $txt['TopicSolved_log'],
+			'description' => $txt['TopicSolved_log_desc'],
+		];
+
+		// Do the column stuff!
+		$sort_types = [
+			'action' => 'lm.action',
+			'time' => 'lm.log_time',
+			'member' => 'mem.real_name',
+		];
+
+		// Setup the direction stuff...
+		$context['order'] = isset($_REQUEST['sort']) && isset($sort_types[$_REQUEST['sort']]) ? $_REQUEST['sort'] : 'time';
+
+		// If we're coming from a search, get the variables.
+		if (!empty($_REQUEST['params']) && empty($_REQUEST['is_search']))
+		{
+			$search_params = base64_decode(strtr($_REQUEST['params'], array(' ' => '+')));
+			$search_params = $smcFunc['json_decode']($search_params, true);
+		}
+
+		// This array houses all the valid search types.
+		$searchTypes = [
+			'action' => ['sql' => 'lm.action', 'label' => $txt['modlog_action']],
+			'member' => ['sql' => 'mem.real_name', 'label' => $txt['modlog_member']],
+			'group' => ['sql' => 'mg.group_name', 'label' => $txt['modlog_position']],
+			'ip' => ['sql' => 'lm.ip', 'label' => $txt['modlog_ip']]
+		];
+
+		if (!isset($search_params['string']) || (!empty($_REQUEST['search']) && $search_params['string'] != $_REQUEST['search']))
+			$search_params_string = empty($_REQUEST['search']) ? '' : $_REQUEST['search'];
+		else
+			$search_params_string = $search_params['string'];
+
+		if (isset($_REQUEST['search_type']) || empty($search_params['type']) || !isset($searchTypes[$search_params['type']]))
+			$search_params_type = isset($_REQUEST['search_type']) && isset($searchTypes[$_REQUEST['search_type']]) ? $_REQUEST['search_type'] : (isset($searchTypes[$context['order']]) ? $context['order'] : 'member');
+		else
+			$search_params_type = $search_params['type'];
+
+		$search_params_column = $searchTypes[$search_params_type]['sql'];
+		$search_params = [
+			'string' => $search_params_string,
+			'type' => $search_params_type,
+		];
+
+		// Setup the search context.
+		$context['search_params'] = empty($search_params['string']) ? '' : base64_encode($smcFunc['json_encode']($search_params));
+		$context['search'] = array(
+			'string' => $search_params['string'],
+			'type' => $search_params['type'],
+			'label' => $searchTypes[$search_params_type]['label'],
+		);
+
+		$this->language();
+		require_once($sourcedir . '/Subs-List.php');
+		require_once($sourcedir . '/Modlog.php');
+		$listOptions = [
+			'id' => 'solved_log_list',
+			// 'title' => $txt['TopicSolved_log'],
+			'items_per_page' => 20,
+			'not_items_label' => $txt['TopicSolved_no_logs'],
+			'base_href' => $scripturl . $context['url_start'],
+			'default_sort_col' => 'time',
+			'get_items' => [
+				'function' => 'list_getModLogEntries',
+				'params' => [
+				(!empty($search_params['string']) ? ' INSTR({raw:sql_type}, {string:search_string}) > 0' : ''),
+				['sql_type' => $search_params_column, 'search_string' => $search_params['string']],
+				$this->logType,
+				]
+			],
+			'get_count' => [
+				'function' => 'list_getModLogEntryCount',
+				'params' => [
+				(!empty($search_params['string']) ? ' INSTR({raw:sql_type}, {string:search_string}) > 0' : ''),
+				['sql_type' => $search_params_column, 'search_string' => $search_params['string']],
+				$this->logType,
+				]
+			],
+			'columns' => [
+				'action' => [
+					'header' => [
+						'value' => $txt['modlog_action'],
+						'class' => 'lefttext',
+					],
+					'data' => [
+						'function' => function($row) use($txt, $scripturl) {
+							return sprintf($txt['TopicSolved_log_marked_' . (!empty($row['extra']['solved']) ? 'solved' : 'not_solved')], $scripturl . '?topic=' . $row['topic']['id'] . '.0', $row['topic']['subject']);
+						},
+					],
+				],
+				'time' => [
+					'header' => [
+						'value' => $txt['modlog_date'],
+						'class' => 'lefttext'
+					],
+					'data' => [
+						'db' => 'time'
+					],
+					'sort' => [
+						'default' => 'lm.log_time DESC',
+						'reverse' => 'lm.log_time',
+					]
+				],
+				'member' => [
+					'header' => [
+						'value' => $txt['modlog_member'],
+						'class' => 'lefttext'
+					],
+					'data' => [
+						'db' => 'moderator_link'
+					],
+					'sort' => [
+						'default' => 'mem.real_name',
+						'reverse' => 'mem.real_name DESC',
+					]
+				],
+				'board' => [
+					'header' => [
+						'value' => $txt['TopicSolved_moved_log'],
+						'class' => 'lefttext'
+					],
+					'data' => [
+						'function' => function($row) use($txt) {
+							return $row['extra']['board'] ?? $txt['none'];
+						},
+					],
+				],
+				'delete' => [
+					'header' => [
+						'value' => '<input type="checkbox" name="all" onclick="invertAll(this, this.form);">',
+						'class' => 'centercol',
+					],
+					'data' => [
+						'function' => function($row) {
+							return '<input type="checkbox" name="delete[]" value="' . $row['id'] . '"' . ($row['editable'] ? '' : ' disabled') . '>';
+						},
+						'class' => 'centercol',
+					]
+				],
+			],
+
+
+			'form' => [
+				'href' => $scripturl . $context['url_start'],
+				'include_sort' => true,
+				'include_start' => true,
+				'hidden_fields' => [
+					$context['session_var'] => $context['session_id'],
+					'params' => $context['search_params']
+				],
+				'token' => 'mod-solved',
+			],
+			'additional_rows' => [
+				[
+				'position' => 'after_title',
+				'value' => '
+					' . $txt['modlog_search'] . ' (' . $txt['modlog_by'] . ': ' . $context['search']['label'] . '):
+					<input type="text" name="search" size="18" value="' . $smcFunc['htmlspecialchars']($context['search']['string']) . '">
+					<input type="submit" name="is_search" value="' . $txt['modlog_go'] . '" class="button" style="float:none">
+					' . ($context['can_delete'] ? '
+					<input type="submit" name="remove" value="' . $txt['modlog_remove'] . '" data-confirm="' . $txt['modlog_remove_selected_confirm'] . '" class="button you_sure">
+					<input type="submit" name="removeall" value="' . $txt['modlog_removeall'] . '" data-confirm="' . $txt['modlog_remove_all_confirm'] . '" class="button you_sure">' : ''),
+				'class' => '',
+				],
+				[
+				'position' => 'below_table_data',
+				'value' => $context['can_delete'] ? '
+					<input type="submit" name="remove" value="' . $txt['modlog_remove'] . '" data-confirm="' . $txt['modlog_remove_selected_confirm'] . '" class="button you_sure">
+					<input type="submit" name="removeall" value="' . $txt['modlog_removeall'] . '" data-confirm="' . $txt['modlog_remove_all_confirm'] . '" class="button you_sure">' : '',
+				'class' => 'floatright',
+				],
+			],
+
+		];
+
+		createToken('mod-solved');
+		createList($listOptions);
+		$context['sub_template'] = 'show_list';
+		$context['default_list'] = 'solved_log_list';
 	}
 }
