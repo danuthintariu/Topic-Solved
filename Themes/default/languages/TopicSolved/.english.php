@@ -29,8 +29,19 @@ $txt['permissionname_solve_topics_any'] = 'Mark any topic as solved';
 $txt['permissionhelp_solve_topics'] = 'This permission allows a user to mark a topic as solved';
 
 // Settings
-$txt['TopicSolved_automove_enable'] = 'Enable auto moving solved topics to specfic boards';
-$txt['TopicSolved_automove_enable_desc'] = 'You can select the boards for each board when editing or adding boards within the forum admin.';
-$txt['TopicSolved_automove_where'] = 'Select destination board for auto moving solved topics';
-$txt['TopicSolved_automove_where_desc'] = 'When no board is selected, the topics will remain in the same board after being marked as solved.';
+$txt['TopicSolved_automove_enable'] = 'Enable auto moving solved or not solved topics to specfic boards';
+$txt['TopicSolved_automove_enable_desc'] = 'You can select the boards for each board when editing or adding boards within the forum admin. The topic is only moved when there is a change in the solved status.';
+$txt['TopicSolved_solve_automove'] = 'Status to auto move solved topics?';
+$txt['TopicSolved_solved_destination'] = 'Select destination board for auto moving solved topics';
+$txt['TopicSolved_notsolved_destination'] = 'Not solved destination';
 $txt['TopicSolved_indicatorclass_disable'] = 'Disable color and icon indicators for solved topics';
+$txt['TopicSolved_auto_solved'] = 'Solved';
+$txt['TopicSolved_auto_notsolved'] = 'Not Solved';
+
+// Loggging
+$txt['TopicSolved_log'] = 'Solved Topics Log';
+$txt['TopicSolved_log_desc'] = 'Use this area to view the topics marked as solved.';
+$txt['TopicSolved_no_logs'] = 'No topics have been solved.';
+$txt['TopicSolved_log_marked_solved'] = '<a href="%1$s">%2$s</a> marked as solved.';
+$txt['TopicSolved_log_marked_not_solved'] = '<a href="%1$s">%2$s</a> marked as not solved.';
+$txt['TopicSolved_moved_log'] = 'Destination Board';
