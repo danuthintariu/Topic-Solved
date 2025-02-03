@@ -45,3 +45,4 @@ $txt['TopicSolved_no_logs'] = 'No topics have been solved.';
 $txt['TopicSolved_log_marked_solved'] = '<a href="%1$s">%2$s</a> marked as solved.';
 $txt['TopicSolved_log_marked_not_solved'] = '<a href="%1$s">%2$s</a> marked as not solved.';
 $txt['TopicSolved_moved_log'] = 'Destination Board';
+$txt['modlog_ac_clearlog_solved'] = 'Cleared the solved topics log';
