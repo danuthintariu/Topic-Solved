@@ -146,7 +146,7 @@ class TopicSolved
 
 		// Get the topic
 		$request = $smcFunc['db_query']('', '
-			SELECT t.id_topic, t.is_solved, t.id_first_msg, t.id_board, t.solved_board, m.id_member, b.solved_destination
+			SELECT t.id_topic, t.is_solved, t.id_first_msg, t.id_board, t.solved_board, m.id_member, b.solve_automove, b.solved_destination
 			FROM {db_prefix}topics AS t
 				LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
 				LEFT JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
@@ -180,18 +180,16 @@ class TopicSolved
 		$smcFunc['db_query']('', '
 			UPDATE {db_prefix}topics
 			SET
-				is_solved = {int:is_solved}' . (!empty($modSettings['TopicSolved_automove_enable']) && !empty($topic_info['solved_destination']) ? ',
-				solved_board = {int:solved_board}' : '' ) . '
+				is_solved = {int:is_solved}
 			WHERE id_topic = {int:topic}',
 			[
 				'is_solved' => $topic_info['is_solved'] ? 0 : 1,
 				'topic' => $topic_info['id_topic'],
-				'solved_board' => empty($topic_info['is_solved']) && empty($topic_info['solved_board']) ? $topic_info['id_board'] : 0,
 			]
 		);
 
 		// Auto-move topic?
-		$destinationBoard = !empty($topic_info['solved_board']) ? $topic_info['solved_board'] : $topic_info['solved_destination'] ?? 0;
+		$destinationBoard = $topic_info['is_solved'] == $topic_info['solve_automove'] ? $topic_info['solved_destination'] : 0;
 		$this->automove($topic_info['id_topic'], $destinationBoard);
 		
 		// Log the action
@@ -289,6 +287,7 @@ class TopicSolved
 		$boardColumns[] = 'b.can_solve';
 
 		if (!empty($modSettings['TopicSolved_automove_enable'])) {
+			$boardColumns[] = 'b.solve_automove';
 			$boardColumns[] = 'b.solved_destination';
 		}
 	}
@@ -305,6 +304,7 @@ class TopicSolved
 		$boards[$row['id_board']]['can_solve'] = $row['can_solve'];
 
 		if (!empty($modSettings['TopicSolved_automove_enable'])) {
+			$boards[$row['id_board']]['solve_automove'] = $row['solve_automove'];
 			$boards[$row['id_board']]['solved_destination'] = $row['solved_destination'];
 		}
 	}
@@ -340,8 +340,13 @@ class TopicSolved
 
 		// Auto Move solved topic
 		if (!empty($modSettings['TopicSolved_automove_enable'])) {
+			$boardOptions['solve_automove'] = $_POST['TopicSolved_solve_automove'] ?? 0;
 			$boardOptions['solved_destination'] = $_POST['TopicSolved_solved_destination'] ?? 0;
+			
+			$boardUpdates[] = 'solve_automove = {int:solve_automove}';
 			$boardUpdates[] = 'solved_destination = {int:solved_destination}';
+
+			$boardUpdateParameters['solve_automove'] = $boardOptions['solve_automove'] ?? 0;
 			$boardUpdateParameters['solved_destination'] = $boardOptions['solved_destination'] ?? 0;
 		}
 	}
@@ -360,8 +365,15 @@ class TopicSolved
 
 		// Auto move solved topics
 		if (!empty($modSettings['TopicSolved_automove_enable'])) {
+			$context['custom_board_settings']['solve_automove'] = [
+				'dt' => '<label for="TopicSolved_solve_automove"><strong>'. $txt['TopicSolved_solve_automove']. '</strong></label>',
+				'dd' => '<select id="TopicSolved_solve_automove" name="TopicSolved_solve_automove">
+							<option value="0"' . (empty($context['board']['solve_automove']) ? ' selected' : '') . '>' . $txt['TopicSolved_auto_solved'] . '</option>
+							<option value="1"' . (!empty($context['board']['solve_automove']) ? ' selected' : '') . '>' . $txt['TopicSolved_auto_notsolved'] . '</option>
+						</select>',
+			];
 			$context['custom_board_settings']['solved_destination'] = [
-				'dt' => '<label for="TopicSolved_solved_destination"><strong>'. $txt['TopicSolved_automove_where']. '</strong></label>',
+				'dt' => '<label for="TopicSolved_solved_destination"><strong>'. $txt['TopicSolved_solved_destination']. '</strong></label>',
 				'dd' => $this->boardsList(),
 			];
 		}
@@ -370,23 +382,25 @@ class TopicSolved
 	/**
 	 * Get a list of boards using SMF functions
 	 * 
+	 * @param bool The solved status.
+	 * 
 	 * @return string A formatted select HTML element with the forum boards.
 	 */
-	private function boardsList() : string
+	private function boardsList(bool $setting_type = true) : string
 	{
 		global $sourcedir, $context, $txt;
 
 		require_once($sourcedir . '/Subs-MessageIndex.php');
 		$board_list = getBoardList(['not_redirection' => true, 'excluded_boards' => [$context['board']['id']]]);
 		
-		$boards_select = '<select id="TopicSolved_solved_destination" name="TopicSolved_solved_destination">
+		$boards_select = '<select id="TopicSolved_' . (!$setting_type ? 'not' : '') . 'solved_destination" name="TopicSolved_' . (!$setting_type ? 'not' : '') . 'solved_destination">
 				<option value="0">' . $txt['none'] . '</option>';
 
 		foreach ($board_list as $board_category) {
 			$boards_select .= '<optgroup label="' . $board_category['name'] . '">';
 
 			foreach ($board_category['boards'] as $board_option) {
-				$boards_select .= '<option value="' . $board_option['id'] . '" ' . (!empty($context['board']['solved_destination']) && $context['board']['solved_destination'] == $board_option['id'] ? ' selected' : '') . '>' . $board_option['name'] . '</option>';
+				$boards_select .= '<option value="' . $board_option['id'] . '" ' . (!empty($context['board'][(!$setting_type ? 'not' : '') . 'solved_destination']) && $context['board'][(!$setting_type ? 'not' : '') . 'solved_destination'] == $board_option['id'] ? ' selected' : '') . '>' . $board_option['name'] . '</option>';
 			}
 
 			$boards_select .= '</optgroup>';
@@ -402,7 +416,7 @@ class TopicSolved
 	 * 
 	 * @param array $permissionList: The list of permissions
 	 */
-	public function permissions(&$permissionGroups, &$permissionList, &$leftPermissionGroups, &$hiddenPermissions, &$relabelPermissions) : void
+	public function permissions(&$permissionGroups, &$permissionList) : void
 	{
 		$permissionList['board']['solve_topics'] = [true, 'topic', 'moderate'];
 	}
