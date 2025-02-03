@@ -27,23 +27,22 @@ $smcFunc['db_add_column'](
 		'not_null' => true,
 	]
 );
-// Add a column for remembering the origin of the solved topic
-$smcFunc['db_add_column'](
-	'{db_prefix}topics',
-	[
-		'name' => 'solved_board',
-		'type' => 'smallint',
-		'default' => 0,
-		'unsigned' => true,
-		'not_null' => true,
-	]
-);
-
 // Add a column to the boards table
 $smcFunc['db_add_column'](
 	'{db_prefix}boards', 
 	[
 		'name' => 'can_solve',
+		'type' => 'tinyint',
+		'default' => 0,
+		'unsigned' => true,
+		'not_null' => true,
+	]
+);
+// Add a column for choosing which status to use for auto-moving.
+$smcFunc['db_add_column'](
+	'{db_prefix}boards', 
+	[
+		'name' => 'solve_automove',
 		'type' => 'tinyint',
 		'default' => 0,
 		'unsigned' => true,

@@ -16,12 +16,12 @@ elseif (!defined('SMF'))
 
 db_extend('packages');
 
-// Add a column for remembering the origin of the solved topic
+// Add a column for choosing which status to use for auto-moving.
 $smcFunc['db_add_column'](
-	'{db_prefix}topics',
+	'{db_prefix}boards', 
 	[
-		'name' => 'solved_board',
-		'type' => 'smallint',
+		'name' => 'solve_automove',
+		'type' => 'tinyint',
 		'default' => 0,
 		'unsigned' => true,
 		'not_null' => true,
