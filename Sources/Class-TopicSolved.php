@@ -81,6 +81,7 @@ class TopicSolved
 		$config_vars[] = ['boards', 'TopicSolved_boards_can_solve', 'label' => $txt['TopicSolved_boards_select']];
 		$config_vars[] = ['check', 'TopicSolved_indicatorclass_disable'];
 		$config_vars[] = ['check', 'TopicSolved_automove_enable', 'subtext' => $txt['TopicSolved_automove_enable_desc']];
+		$config_vars[] = ['check', 'TopicSolved_single_status', 'subtext' => $txt['TopicSolved_single_status_desc']];
 
 		// Set those boards to be able to solve topics when saving this setting...
 		if (!isset($_REQUEST['save'])) {
@@ -179,6 +180,12 @@ class TopicSolved
 			isAllowedTo('solve_topics_any');
 		}
 
+		// auto-move single status?
+		$solved_status = $topic_info['is_solved'] ? 0 : 1;
+		if (!empty($modSettings['TopicSolved_single_status']) && !empty($topic_info['solved_destination'])) {
+			$solved_status = !empty($topic_info['solve_automove']) ? 0 : 1;
+		}
+
 		// Solve or unsolve...
 		$smcFunc['db_query']('', '
 			UPDATE {db_prefix}topics
@@ -186,13 +193,13 @@ class TopicSolved
 				is_solved = {int:is_solved}
 			WHERE id_topic = {int:topic}',
 			[
-				'is_solved' => $topic_info['is_solved'] ? 0 : 1,
+				'is_solved' => $solved_status,
 				'topic' => $topic_info['id_topic'],
 			]
 		);
 
 		// Auto-move topic?
-		$destinationBoard = $topic_info['is_solved'] == $topic_info['solve_automove'] ? $topic_info['solved_destination'] : 0;
+		$destinationBoard = !$solved_status == $topic_info['solve_automove'] ? $topic_info['solved_destination'] : 0;
 		$this->automove($topic_info['id_topic'], $destinationBoard);
 		
 		// Log the action
@@ -256,7 +263,7 @@ class TopicSolved
 	 */
 	public function display_buttons(&$buttons) : void
 	{
-		global $context, $scripturl, $modSettings, $board, $user_info;
+		global $context, $scripturl, $modSettings, $board, $user_info, $smcFunc;
 
 		// Check if it's available and can solve
 		if (!isset($context['topicinfo']['is_solved']) || !in_array($board, explode(',', $modSettings['TopicSolved_boards_can_solve']))) {
@@ -276,6 +283,25 @@ class TopicSolved
 
 		// Solving button
 		$buttons['solve'] = ['text' => !empty($context['topicinfo']['is_solved']) ? 'TopicSolved_mark_unsolved' : 'TopicSolved_mark_solved', 'url' => $scripturl . '?action=topicsolve;topic=' . $context['current_topic'] . ';' . $context['session_var'] . '=' . $context['session_id'], 'class' => !empty($context['topicinfo']['is_solved']) ? 'topic_unsolve' : 'topic_solve'];
+
+		// Auto-move behavior
+		if (!empty($modSettings['TopicSolved_automove_enable']) && !empty($modSettings['TopicSolved_single_status'])) {
+			$board_info = $smcFunc['db_query']('', '
+				SELECT b.solve_automove, b.solved_destination
+				FROM {db_prefix}boards as b
+				WHERE id_board = {int:board}',
+				[
+					'board' => $board,
+				]
+			);
+			$context['solved_board_info'] = $smcFunc['db_fetch_assoc']($board_info);
+			$smcFunc['db_free_result']($board_info);
+
+			if (!empty($context['solved_board_info']['solved_destination'])) {
+				$buttons['solve']['text'] = 'TopicSolved_mark_' . (empty($context['solved_board_info']['solve_automove']) ? 'solved' : 'unsolved');
+				$buttons['solve']['class'] = 'topic_' . (empty($context['solved_board_info']['solve_automove']) ? 'solve' : 'unsolve');
+			}
+		}
 	}
 
 	/**
