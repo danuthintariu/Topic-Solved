@@ -60,6 +60,9 @@ class TopicSolved
 		// Moderation Center
 		add_integration_function('integrate_log_types', __CLASS__ . '::logTypes#', false, $sourcedir . '/Class-TopicSolved.php');
 		add_integration_function('integrate_moderate_areas', __CLASS__ . '::moderate#', false, $sourcedir . '/Class-TopicSolved.php');
+
+		// Maintenance
+		add_integration_function('integrate_manage_maintenance', __CLASS__ . '::manageMaintenance#', false, $sourcedir . '/Class-TopicSolved.php');
 	}
 
 	/**
@@ -758,5 +761,47 @@ class TopicSolved
 		createList($listOptions);
 		$context['sub_template'] = 'show_list';
 		$context['default_list'] = 'solved_log_list';
+	}
+
+	/**
+	 * Modify the maintenance subactions
+	 * 
+	 * @param array Subactions for the maintenance section
+	 */
+	public function manageMaintenance(array &$subActions) : void
+	{
+		global $context;
+
+		$subActions['topics']['activities']['solveboard'] = [$this, 'boardSolve'];
+
+		// Add sub-layer
+		loadTemplate('TopicSolved');
+		$context['template_layers'][] = 'topic_solved';
+	}
+
+	/**
+	 * Mark zll topics as solved or not solved in a board
+	 */
+	public function boardSolve() : void
+	{
+		global $smcFunc;
+
+		checkSession();
+		validateToken('admin-maint');
+
+		$smcFunc['db_query']('','
+			UPDATE {db_prefix}topics
+			SET
+				is_solved = {int:solved}
+			WHERE id_board = {int:board}
+				AND approved = {int:approved}
+				AND id_redirect_topic = {int:redirect}',
+			[
+				'solved' => (int) isset($_REQUEST['solved_status']) ? 1 : 0,
+				'board' => (int) $_REQUEST['id_board_solve'],
+				'approved' => 1,
+				'redirect' => 0
+			]
+		);
 	}
 }

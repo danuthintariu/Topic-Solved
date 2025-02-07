@@ -37,6 +37,11 @@ $txt['TopicSolved_notsolved_destination'] = 'Not solved destination';
 $txt['TopicSolved_indicatorclass_disable'] = 'Disable color and icon indicators for solved topics';
 $txt['TopicSolved_auto_solved'] = 'Solved';
 $txt['TopicSolved_auto_notsolved'] = 'Not Solved';
+$txt['TopicSolved_maint_board_solve'] = 'Solve Topics in a board';
+$txt['TopicSolved_maint_board_solve_desc'] = 'This action is unaffected by the auto-move setting, no topics will be moved when performing this action.';
+$txt['TopicSolved_maint_solve_status'] = 'Status to set for the topics';
+$txt['TopicSolved_maint_board_solve_save'] = 'Update now';
+$txt['TopicSolved_maint_board_solve_sure'] = 'Are you sure you want to change the status for all of the topics in the specificed board?';
 
 // Loggging
 $txt['TopicSolved_log'] = 'Solved Topics Log';
