@@ -800,6 +800,10 @@ class TopicSolved
 
 		$subActions['topics']['activities']['solveboard'] = [$this, 'boardSolve'];
 
+		if ((isset($_REQUEST['sa']) && $_REQUEST['sa'] !== 'topics') || !isset($_REQUEST['sa'])) {
+			return;
+		}
+
 		// Add sub-layer
 		loadTemplate('TopicSolved');
 		$context['template_layers'][] = 'topic_solved';
