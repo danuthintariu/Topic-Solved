@@ -19,6 +19,13 @@
 [/li]
 [li][font=Sans-serif]Select boards where it applies[/font][/li]
 [li][font=Sans-serif]Color the solved topics in messageindex[/font][/li]
+[li][font=Sans-serif]Solved Log[/font][/li]
+[li][font=Sans-serif]Auto Move Topics[/font]
+[list type=circle]
+[li][font=Sans-serif]Move depending on status to a specific board/font][/li]
+[li][font=Sans-serif]Setting to only mark as solved or not solved[/font][/li]
+[/list]
+[/li]
 [li][font=Sans-serif]Integration with [url="https://custom.simplemachines.org/index.php?mod=4274"]Best Answer[/url][/font][/li]
 [/list]
 

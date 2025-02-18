@@ -1,5 +1,13 @@
 # Changelog
 
+#### 1.3.1 - 17 February 2025
+- ![Bug Fix](https://smftricks.com/assets/changelog/bug--minus.png) Fixed issue with log saving the wrong status when status lock is active.
+
+#### 1.3 - 10 February 2025
+- ![New Feature](https://smftricks.com/assets/changelog/tag--plus.png) Added admin maintenance option to mark topics as solved/not solved in bulk.
+- ![New Feature](https://smftricks.com/assets/changelog/tag--plus.png) Added setting to lock a single status to mark topics as either solved or not solved.
+- ![New Feature](https://smftricks.com/assets/changelog/tag--plus.png) Added a topic solved log in the moderation center.
+---
 #### 1.2 - 25 January 2025
 - ![New Feature](https://smftricks.com/assets/changelog/tag--plus.png) Each board can now auto-move solved topics to a different board.
 - ![New Feature](https://smftricks.com/assets/changelog/tag--plus.png) Added setting to disable color and icon indicators for solved topics.

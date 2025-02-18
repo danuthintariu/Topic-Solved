@@ -12,6 +12,10 @@
   - Solve own topics
 - Select boards where it applies
 - Color the solved topics in messageindex
+- Solved Log
+- Auto Move Topics
+  - Move depending on status to a specific board
+  - Setting to only mark as solved or not solved[
 - Integration with [Best Answer](https://github.com/SychO9/smf-best-answer)
 
 ## 📦 Installation
