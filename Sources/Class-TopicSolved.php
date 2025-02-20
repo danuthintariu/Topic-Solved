@@ -203,7 +203,7 @@ class TopicSolved
 		$this->automove($topic_info['id_topic'], $destinationBoard);
 		
 		// Log the action
-		logAction('solve', ['topic' => $topic_info['id_topic'], 'board' => $destinationBoard, 'solved' => $topic_info['is_solved'] ? 0 : 1], 'solved');
+		logAction('solve', ['topic' => $topic_info['id_topic'], 'board' => $destinationBoard, 'solved' => $solved_status], 'solved');
 
 		// We are done here
 		if (empty($destinationBoard)) {
